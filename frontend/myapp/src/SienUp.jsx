@@ -116,8 +116,8 @@ export default function SignUp() {
                         onChange={handleChange}
                         className="w-full mt-1 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7AB2B2]"
                     />
-                    {errors.email && (
-                        <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+                    {errors.phone && (
+                        <p className="text-red-500 text-sm mt-1">{errors.phone}</p>
                     )}
                 </div>
 
@@ -148,7 +148,7 @@ export default function SignUp() {
                         onChange={handleChange}
                         className="w-full mt-1 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7AB2B2]"
                     />
-                    {errors.confirmPassword && (
+                    {errors.gender && (
                         <p className="text-red-500 text-sm mt-1">
                             {errors.gender}
                         </p>

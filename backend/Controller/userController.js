@@ -23,17 +23,19 @@ exports.register = async (req, res) => {
     try {
         // console.log(req.body);
         const { name, email, phone, gender,password } = req.body;
-            if (!(name && email && phone && gender)) {
-            return res.status(400).json({ message: "All input are required" });
-        }
+        console.log(req.body);
+           if (!(name && email && phone && gender && password)) {
+  return res.status(400).json({ message: "All input are required" });
+}
         const userExist = await user.findOne({ email });
         if (userExist) {
-            return res.status(400).json({ message: "User already exists" });
+            return res.status(400).json({ message: "User already exists" })
         }
     //    const password = generatePassword();
          const salt = bcrypt.genSaltSync(10)
         const hash = bcrypt.hashSync(password, salt);
         const data = { name, email, phone, password: hash, gender}
+        
         
         const newUser = new user(data);
         await newUser.save();
@@ -50,7 +52,6 @@ exports.register = async (req, res) => {
             from: process.env.SENT_EMAIL,
             to: email,
             subject: "Account Created successfully",
-            subject: "Account Created",
             html: `
     <p>Hello <b>${name}</b>,</p>
 
@@ -74,7 +75,7 @@ exports.register = async (req, res) => {
   `,
 
         });
-        res.status(201).json({ message: "User registered successfully", password });
+       res.status(201).json({ message: "User registered successfully" });
     } catch (error) {
         res.status(500).json({ message: "Server error", error: error.message });
     }

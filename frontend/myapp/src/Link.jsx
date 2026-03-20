@@ -85,7 +85,7 @@ export default function Link() {
 
   const handleGet = async () => {
     try {
-      const res = await api.get("/task/");
+      const res = await api.get("/task/findall");
       const data = res.data;
       if (Array.isArray(data) && data.length > 0) {
         setTableData(data[data.length - 1].table ?? data);
@@ -161,12 +161,12 @@ export default function Link() {
           💾 Save {tableData.length > 0 ? `(${tableData.length} tasks)` : ""}
         </button>
 
-        <button
+        {/* <button
           onClick={handleGet}
           className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
         >
           📥 Load from DB
-        </button>
+        </button> */}
 
         {tableData.length > 0 && (
           <button
