@@ -54,7 +54,7 @@ export default function SignUp() {
                 // console.log(response.data);
  alert("Signup Successful 🎉");
                 setErrors({});
-                alert("Signup Successful 🎉");
+                // alert("Signup Successful 🎉");
                 navigate("/");
             } catch (error) {
                 console.log(error);
@@ -163,7 +163,15 @@ export default function SignUp() {
                 >
                     Create Account
                 </button>
-                 <Link to="/">Login</Link>
+                 <p className="text-center mt-4 text-sm text-gray-600">
+  Already have an account?{" "}
+  <Link
+    to="/"
+    className="text-[#088395] font-semibold hover:underline"
+  >
+    Login
+  </Link>
+</p>
             </form>
            
         </div>
