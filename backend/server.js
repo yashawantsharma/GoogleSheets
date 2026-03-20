@@ -37,8 +37,15 @@ mongoose.connect(process.env.DataBase_URL)
 
 app.use(express.json());
 // app.use(cors());
+// app.use(cors({
+//   origin: "http://localhost:5173", 
+//   credentials: true
+// }));
 app.use(cors({
-  origin: "http://localhost:5173", 
+  origin: [
+    "http://localhost:5173",
+    "https://googlesheets-1-yi0v.onrender.com"
+  ],
   credentials: true
 }));
 // app.get("/health", (req, res) => res.status(200).json({ status: "ok" }));
