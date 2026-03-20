@@ -1,6 +1,6 @@
 import { useState } from "react";
 import api from "../axios/axiosInsorance"
-import { Link } from "react-router-dom";
+import { Link ,useNavigate} from "react-router-dom";
 
 
 export default function SignUp() {
@@ -17,7 +17,7 @@ export default function SignUp() {
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
     };
-
+    const navigate=useNavigate();
     const validate = () => {
         let newErrors = {};
 
@@ -47,13 +47,15 @@ export default function SignUp() {
         if (Object.keys(validationErrors).length > 0) {
             setErrors(validationErrors);
         } else {
+            // console.log(">>>>>>>>",form)
             try {
                 const response = await api.post("/user/", form);
 
-                console.log(response.data);
-
+                // console.log(response.data);
+ alert("Signup Successful 🎉");
                 setErrors({});
                 alert("Signup Successful 🎉");
+                navigate("/");
             } catch (error) {
                 console.log(error);
                 alert("Signup Failed ❌");

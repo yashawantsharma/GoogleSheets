@@ -23,7 +23,7 @@ exports.register = async (req, res) => {
     try {
         // console.log(req.body);
         const { name, email, phone, gender,password } = req.body;
-        console.log(req.body);
+        console.log("dfghj>>>>>>>>>>",req.body);
            if (!(name && email && phone && gender && password)) {
   return res.status(400).json({ message: "All input are required" });
 }
