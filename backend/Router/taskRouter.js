@@ -9,5 +9,6 @@ route.post("/", taskController.addtask);
 route.get("/findall",taskController.findall);
 route.put("/update/:id", taskController.updateTask);
 route.delete("/delete/:id", taskController.deleteTask);
+route.post("/bulk", taskController.bulkSave); 
 
 module.exports=route
