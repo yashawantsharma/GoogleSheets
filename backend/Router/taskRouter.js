@@ -7,5 +7,7 @@ const taskController = require("../Controller/taskController");
 
 route.post("/", taskController.addtask);
 route.get("/findall",taskController.findall);
+route.put("/update/:id", taskController.updateTask);
+route.delete("/delete/:id", taskController.deleteTask);
 
 module.exports=route
