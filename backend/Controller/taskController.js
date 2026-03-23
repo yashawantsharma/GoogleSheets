@@ -118,31 +118,29 @@
 //   }
 // };
 
-const Task = require("../Model/taskModel"); // apna model path check karo
+const Task = require("../Model/taskModel"); 
 
-// ─── Find All with Pagination ──────────────────────────────
-// GET /task/findall?page=1&limit=15
+
 const findall = async (req, res) => {
   try {
     const page  = Math.max(1, parseInt(req.query.page)  || 1);
     const limit = Math.max(1, parseInt(req.query.limit) || 15);
     const skip  = (page - 1) * limit;
 
-    // Total count (for frontend to calculate totalPages)
+
     const total = await Task.countDocuments();
 
-    // Paginated data
     const tasks = await Task.find()
-      .sort({ createdAt: -1 })   // newest first — zarurat na ho toh hata sakte ho
+      .sort({ createdAt: -1 }) 
       .skip(skip)
       .limit(limit);
 
     res.status(200).json({
       data: tasks,
       pagination: {
-        total,          // total documents in DB
-        page,           // current page
-        limit,          // rows per page
+        total,        
+        page,           
+        limit,          
         totalPages: Math.ceil(total / limit),
         hasNextPage: page < Math.ceil(total / limit),
         hasPrevPage: page > 1,
@@ -154,45 +152,72 @@ const findall = async (req, res) => {
   }
 };
 
-// ─── Add Single Task ───────────────────────────────────────
-// POST /task/
 const addtask = async (req, res) => {
   try {
     const { title, description, dueDate } = req.body;
+
     if (!title || !description || !dueDate) {
       return res.status(400).json({ message: "All fields are required" });
     }
+
+    // 🔴 Duplicate check
+    const existingTask = await Task.findOne({ title });
+
+    if (existingTask) {
+      return res.status(400).json({
+        message: "Task with this title already exists"
+      });
+    }
+
     const task = await Task.create({ title, description, dueDate });
-    res.status(201).json({ message: "Task created", data: task });
+
+    res.status(201).json({
+      message: "Task created",
+      data: task
+    });
+
   } catch (error) {
     console.error("addtask error:", error);
     res.status(500).json({ message: "Server error", error });
   }
 };
 
-// ─── Bulk Save ─────────────────────────────────────────────
-// POST /task/bulk
+
+const formatDate = (dateStr) => {
+  if (!dateStr) return null;
+
+  const [day, month, year] = dateStr.split("/");
+  return new Date(`${year}-${month}-${day}`);
+};
+
 const bulkSave = async (req, res) => {
   try {
     const { data } = req.body;
+
     if (!Array.isArray(data) || data.length === 0) {
       return res.status(400).json({ message: "No data provided" });
     }
+
     const formatted = data.map((item) => ({
       title:       item.Title       || item.title       || "",
       description: item.Description || item.description || "",
-      dueDate:     item["Due Date"] || item.dueDate     || "",
+      dueDate:     formatDate(item["Due Date"] || item.dueDate),
     }));
+
     const saved = await Task.insertMany(formatted);
-    res.status(201).json({ message: `${saved.length} tasks saved`, data: saved });
+
+    res.status(201).json({
+      message: `${saved.length} tasks saved`,
+      data: saved
+    });
+
   } catch (error) {
     console.error("bulkSave error:", error);
     res.status(500).json({ message: "Server error", error });
   }
 };
 
-// ─── Update Task ───────────────────────────────────────────
-// PUT /task/update/:id
+
 const updateTask = async (req, res) => {
   try {
     const { id } = req.params;
@@ -210,8 +235,7 @@ const updateTask = async (req, res) => {
   }
 };
 
-// ─── Delete Task ───────────────────────────────────────────
-// DELETE /task/delete/:id
+
 const deleteTask = async (req, res) => {
   try {
     const { id } = req.params;

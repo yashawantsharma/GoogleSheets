@@ -14,7 +14,6 @@ export default function Link() {
   const [isDBData, setIsDBData] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
 
-  // ── Modals ─────────────────────────────────────────────────
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState(EMPTY_FORM);
   const [formError, setFormError] = useState("");
@@ -26,12 +25,10 @@ export default function Link() {
   const [editId, setEditId] = useState(null);
   const [editError, setEditError] = useState("");
 
-  // ── Backend Pagination State ────────────────────────────────
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalRows, setTotalRows] = useState(0);
 
-  // Smart page numbers with ellipsis
   const getPageNumbers = () => {
     if (totalPages <= 7) return Array.from({ length: totalPages }, (_, i) => i + 1);
     if (currentPage <= 4) return [1, 2, 3, 4, 5, "...", totalPages];
@@ -40,8 +37,6 @@ export default function Link() {
     return [1, "...", currentPage - 1, currentPage, currentPage + 1, "...", totalPages];
   };
 
-  // ─── Load from DB with page ────────────────────────────────
-  // GET /task/findall?page=1&limit=15
   const handleGet = async (page = 1) => {
     try {
       setDbLoading(true);
@@ -75,7 +70,6 @@ export default function Link() {
     if (page >= 1 && page <= totalPages) handleGet(page);
   };
 
-  // ─── CSV Fetch ─────────────────────────────────────────────
   const handleFetch = async () => {
     if (!url.trim()) return alert("Please enter a CSV URL");
     try {
@@ -101,7 +95,6 @@ export default function Link() {
     }
   };
 
-  // ─── CSV Inline Edit ───────────────────────────────────────
   const handleChange = (index, key, value) => {
     const updated = [...tableData];
     updated[index][key] = value;
@@ -110,7 +103,6 @@ export default function Link() {
 
   const handleDeleteRow = (index) => setTableData(tableData.filter((_, i) => i !== index));
 
-  // ─── Add Task (CSV mode only) ──────────────────────────────
   const openModal = () => { setForm(EMPTY_FORM); setDateInput(""); setFormError(""); setShowModal(true); };
 
   const handleFormChange = (key, value) => {
@@ -127,12 +119,13 @@ export default function Link() {
     setShowModal(false);
   };
 
-  // ─── Bulk Save ─────────────────────────────────────────────
   const handleSave = async () => {
     if (tableData.length === 0) return alert("No data to save");
     try {
       setSaveStatus(null);
-      await api.post("/task/bulk", { data: tableData });
+     const resslt= await api.post("/task/bulk", { data: tableData });
+      console.log(resslt);
+      
       setSaveStatus("success");
     } catch (err) {
       console.error(err.response?.data);
@@ -140,13 +133,11 @@ export default function Link() {
     }
   };
 
-  // ─── Delete from DB ────────────────────────────────────────
   const handleDBDelete = async (id) => {
     if (!window.confirm("Delete this task permanently?")) return;
     try {
       setDeletingId(id);
       await api.delete(`/task/delete/${id}`);
-      // Agar page pe sirf 1 row bachi thi, ek page peeche jao
       const newPage = tableData.length === 1 && currentPage > 1 ? currentPage - 1 : currentPage;
       await handleGet(newPage);
     } catch {
@@ -156,7 +147,6 @@ export default function Link() {
     }
   };
 
-  // ─── Edit Modal ────────────────────────────────────────────
   const openEditModal = (row) => {
     setEditId(row._id);
     setEditForm({ Title: row.Title, Description: row.Description, "Due Date": row["Due Date"] });
@@ -184,7 +174,6 @@ export default function Link() {
     }
   };
 
-  // ─── Clear ─────────────────────────────────────────────────
   const handleClear = () => {
     setTableData([]); setUrl(""); setSaveStatus(null); setIsDBData(false);
     setCurrentPage(1); setTotalPages(1); setTotalRows(0);
@@ -226,7 +215,6 @@ export default function Link() {
         </div>
       </div>
 
-      {/* Action Buttons */}
       <div className="flex flex-wrap gap-2 mb-4">
         <button onClick={openModal}
           className="inline-flex items-center gap-1.5 bg-[#088395] hover:bg-[#065a6b] text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors shadow-sm">
@@ -250,7 +238,6 @@ export default function Link() {
         )}
       </div>
 
-      {/* Mode Badge */}
       {tableData.length > 0 && (
         <div className="flex flex-wrap items-center gap-3 mb-3">
          
@@ -260,7 +247,6 @@ export default function Link() {
         </div>
       )}
 
-      {/* Status Banners */}
       {saveStatus === "success" && (
         <div className="mb-4 p-3 bg-emerald-50 border border-emerald-300 text-emerald-700 rounded-lg text-sm font-medium">✅ All tasks saved successfully!</div>
       )}
@@ -268,7 +254,6 @@ export default function Link() {
         <div className="mb-4 p-3 bg-red-50 border border-red-300 text-red-700 rounded-lg text-sm font-medium">❌ Save failed. Check console.</div>
       )}
 
-      {/* Table */}
       {tableData.length > 0 ? (
         <>
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-auto">
@@ -284,7 +269,6 @@ export default function Link() {
               </thead>
               <tbody>
                 {tableData.map((row, index) => {
-                  // Global serial number based on current page
                   const serial = isDBData ? (currentPage - 1) * LIMIT + index + 1 : index + 1;
                   return (
                     <tr key={row._id ?? index}
@@ -324,7 +308,6 @@ export default function Link() {
             </table>
           </div>
 
-          {/* ── BACKEND PAGINATION BAR ── */}
           {isDBData && totalPages > 1 && (
             <div className="mt-4 flex items-center justify-between flex-wrap gap-3">
               <p className="text-xs text-gray-500">
@@ -374,7 +357,6 @@ export default function Link() {
         )
       )}
 
-      {/* ADD MODAL */}
       {showModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
           onClick={(e) => e.target === e.currentTarget && setShowModal(false)}>
@@ -406,7 +388,6 @@ export default function Link() {
         </div>
       )}
 
-      {/* EDIT MODAL */}
       {editModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
           onClick={(e) => e.target === e.currentTarget && setEditModal(false)}>

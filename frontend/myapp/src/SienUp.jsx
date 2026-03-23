@@ -12,7 +12,7 @@ export default function SignUp() {
   });
 
   const [errors, setErrors] = useState({});
-  const [submitError, setSubmitError] = useState(""); // server-side error
+  const [submitError, setSubmitError] = useState(""); 
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -58,14 +58,12 @@ export default function SignUp() {
     try {
       setLoading(true);
       await api.post("/user/", form);
-      // ✅ Single success alert, then navigate
       alert("Signup Successful 🎉");
       setErrors({});
       navigate("/");
     } catch (error) {
       console.error(error);
 
-      // ✅ Handle duplicate email (MongoDB error code 11000)
       const msg = error.response?.data?.message || "";
       if (
         error.response?.status === 409 ||
@@ -97,7 +95,6 @@ export default function SignUp() {
           Sign Up
         </h2>
 
-        {/* ── Server Error Banner ── */}
         {submitError && (
           <div className="mb-4 p-3 bg-red-50 border border-red-300 text-red-600 rounded-lg text-sm font-medium">
             ❌ {submitError}
@@ -143,7 +140,6 @@ export default function SignUp() {
           {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
         </div>
 
-        {/* Password */}
         <div className="mb-4">
           <label className="block text-sm font-medium text-[#09637E]">Password</label>
           <input
@@ -156,7 +152,6 @@ export default function SignUp() {
           {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
         </div>
 
-        {/* Gender — fixed type="text" (was "rext") */}
         <div className="mb-4">
           <label className="block text-sm font-medium text-[#09637E]">Gender</label>
           <select
