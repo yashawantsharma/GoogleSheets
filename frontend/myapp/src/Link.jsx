@@ -29,6 +29,8 @@ export default function Link() {
   const [totalPages, setTotalPages] = useState(1);
   const [totalRows, setTotalRows] = useState(0);
 
+  const [showerror, setShowError]=useState("")
+
   const getPageNumbers = () => {
     if (totalPages <= 7) return Array.from({ length: totalPages }, (_, i) => i + 1);
     if (currentPage <= 4) return [1, 2, 3, 4, 5, "...", totalPages];
@@ -123,13 +125,13 @@ export default function Link() {
     if (tableData.length === 0) return alert("No data to save");
     try {
       setSaveStatus(null);
-     const resslt= await api.post("/task/bulk", { data: tableData });
+      const resslt = await api.post("/task/bulk", { data: tableData });
       console.log(resslt);
-      
+
       setSaveStatus("success");
     } catch (err) {
-      console.error(err.response?.data);
-      setSaveStatus("error");
+      // alert(err.response?.data.message);
+      setShowError(err.response?.data.message);
     }
   };
 
@@ -240,7 +242,7 @@ export default function Link() {
 
       {tableData.length > 0 && (
         <div className="flex flex-wrap items-center gap-3 mb-3">
-         
+
           {isDBData && (
             <span className="text-xs text-gray-400">{totalRows} total rows · Page {currentPage} of {totalPages}</span>
           )}
@@ -252,6 +254,10 @@ export default function Link() {
       )}
       {saveStatus === "error" && (
         <div className="mb-4 p-3 bg-red-50 border border-red-300 text-red-700 rounded-lg text-sm font-medium">❌ Save failed. Check console.</div>
+      )}
+
+      {showerror  && (
+        <div className="mb-4 p-3 bg-red-50 border border-red-300 text-red-700 rounded-lg text-sm font-medium">{showerror}</div>
       )}
 
       {tableData.length > 0 ? (
@@ -329,11 +335,10 @@ export default function Link() {
                     <span key={`e-${idx}`} className="px-2 py-1.5 text-gray-400 text-sm select-none">…</span>
                   ) : (
                     <button key={page} onClick={() => goToPage(page)} disabled={dbLoading}
-                      className={`min-w-[36px] px-3 py-1.5 rounded-lg border text-sm font-semibold transition-all disabled:opacity-60 ${
-                        currentPage === page
-                          ? "bg-[#088395] text-white border-[#088395] shadow-sm"
-                          : "border-gray-300 text-gray-600 hover:bg-[#088395] hover:text-white hover:border-[#088395]"
-                      }`}>
+                      className={`min-w-[36px] px-3 py-1.5 rounded-lg border text-sm font-semibold transition-all disabled:opacity-60 ${currentPage === page
+                        ? "bg-[#088395] text-white border-[#088395] shadow-sm"
+                        : "border-gray-300 text-gray-600 hover:bg-[#088395] hover:text-white hover:border-[#088395]"
+                        }`}>
                       {page}
                     </button>
                   )
@@ -376,7 +381,7 @@ export default function Link() {
               </div>
               <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Due Date <span className="text-red-400">*</span></label>
-                <input type="date" value={dateInput} onChange={(e) => { setDateInput(e.target.value); const [y,m,d]=e.target.value.split("-"); if(y&&m&&d) handleFormChange("Due Date",`${d}/${m}/${y}`); }} className={inputCls} />
+                <input type="date" value={dateInput} onChange={(e) => { setDateInput(e.target.value); const [y, m, d] = e.target.value.split("-"); if (y && m && d) handleFormChange("Due Date", `${d}/${m}/${y}`); }} className={inputCls} />
               </div>
               {formError && <p className="text-red-500 text-xs font-medium bg-red-50 border border-red-200 px-3 py-2 rounded-lg">⚠️ {formError}</p>}
             </div>
@@ -407,7 +412,7 @@ export default function Link() {
               </div>
               <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Due Date <span className="text-red-400">*</span></label>
-                <input type="date" value={editDateInput} onChange={(e) => { setEditDateInput(e.target.value); const [y,m,d]=e.target.value.split("-"); if(y&&m&&d) setEditForm((p)=>({...p,"Due Date":`${d}/${m}/${y}`})); }} className={inputCls} />
+                <input type="date" value={editDateInput} onChange={(e) => { setEditDateInput(e.target.value); const [y, m, d] = e.target.value.split("-"); if (y && m && d) setEditForm((p) => ({ ...p, "Due Date": `${d}/${m}/${y}` })); }} className={inputCls} />
               </div>
               {editError && <p className="text-red-500 text-xs font-medium bg-red-50 border border-red-200 px-3 py-2 rounded-lg">⚠️ {editError}</p>}
             </div>

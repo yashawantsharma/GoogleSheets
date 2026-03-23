@@ -189,7 +189,6 @@ const formatDate = (dateStr) => {
   const [day, month, year] = dateStr.split("/");
   return new Date(`${year}-${month}-${day}`);
 };
-
 const bulkSave = async (req, res) => {
   try {
     const { data } = req.body;
@@ -198,13 +197,31 @@ const bulkSave = async (req, res) => {
       return res.status(400).json({ message: "No data provided" });
     }
 
-    const formatted = data.map((item) => ({
+    const formatted = data.map((item, index) => ({
       title:       item.Title       || item.title       || "",
       description: item.Description || item.description || "",
       dueDate:     formatDate(item["Due Date"] || item.dueDate),
+      row: index + 1 
     }));
 
-    const saved = await Task.insertMany(formatted);
+    const titles = formatted.map(item => item.title);
+
+    const existingTasks = await Task.find({ title: { $in: titles } });
+
+    const existingTitles = existingTasks.map(task => task.title);
+
+    const duplicateRows = formatted
+      .filter(item => existingTitles.includes(item.title))
+      .map(item => item.row);
+
+    if (duplicateRows.length > 0) {
+      return res.status(400).json({
+        message: `Rows ${duplicateRows.join(", ")} already exist in database. Please change the title name.`,
+        duplicateRows
+      });
+    }
+
+    const saved = await Task.insertMany(formatted.map(({ row, ...rest }) => rest));
 
     res.status(201).json({
       message: `${saved.length} tasks saved`,
@@ -216,7 +233,6 @@ const bulkSave = async (req, res) => {
     res.status(500).json({ message: "Server error", error });
   }
 };
-
 
 const updateTask = async (req, res) => {
   try {
